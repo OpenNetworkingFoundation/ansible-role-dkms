@@ -1,0 +1,87 @@
+---
+# dkms tasks/ice.yml
+#
+# SPDX-FileCopyrightText: © 2021 Open Networking Foundation <support@opennetworking.org>
+# SPDX-License-Identifier: Apache-2.0
+
+- name: Download ice - Intel E810 network adapter driver
+  get_url:
+    url: "{{ dkms_ice_dl_url }}"
+    dest: "{{ dkms_dist_dir }}/{{ dkms_ice_dl_url | basename }}"
+    checksum: "{{ dkms_ice_checksum }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: Create ice directory in /usr/src
+  file:
+    path: "/usr/src/ice-{{ dkms_ice_version }}"
+    state: directory
+    owner: "root"
+    group: "root"
+    mode: "0755"
+
+- name: Decompress ice archive
+  unarchive:
+    remote_src: true
+    src: "{{ dkms_dist_dir }}/{{ dkms_ice_dl_url | basename }}"
+    dest: "/usr/src/ice-{{ dkms_ice_version }}"
+    owner: "root"
+    group: "root"
+    extra_opts:
+      - "--strip-components=1"  # remove initial directory name
+    creates: "/usr/src/ice-{{ dkms_ice_version }}/README"
+
+- name: Create firmware update directory
+  file:
+    path: "/lib/firmware/updates/intel/ice/ddp/"
+    state: directory
+    owner: "root"
+    group: "root"
+    mode: "0755"
+
+- name: Copy ice firmware to firmware update directory
+  copy:
+    remote_src: true
+    src: "/usr/src/ice-{{ dkms_ice_version }}/ddp/{{ item }}"
+    dest: "/lib/firmware/updates/intel/ice/ddp/{{ item }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  with_items:
+    - ice-1.3.26.0.pkg
+    - LICENSE
+
+- name: Symlink firmware to non-versioned location
+  file:
+    state: link
+    force: true
+    src: "/lib/firmware/updates/intel/ice/ddp/ice-1.3.26.0.pkg"
+    dest: "/lib/firmware/updates/intel/ice/ddp/ice.pkg"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: Copy over ice dkms.conf
+  template:
+    src: "ice_dkms.conf.j2"
+    dest: "/usr/src/ice-{{ dkms_ice_version }}/dkms.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: add ice to DKMS
+  command:
+    cmd: "dkms add -m ice -v {{ dkms_ice_version }}"
+    chdir: "/usr/src/ice-{{ dkms_ice_version }}"
+    creates: "/var/lib/dkms/ice/{{ dkms_ice_version }}/source/README"
+
+- name: build ice using DKMS
+  command:
+    cmd: "dkms build -m ice -v {{ dkms_ice_version }}"
+    chdir: "/usr/src/ice-{{ dkms_ice_version }}"
+
+- name: install ice modules with DKMS
+  command:
+    cmd: "dkms install -m ice -v {{ dkms_ice_version }}"
+    chdir: "/usr/src/ice-{{ dkms_ice_version }}"

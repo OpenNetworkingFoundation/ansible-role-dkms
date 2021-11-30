@@ -1,0 +1,13 @@
+{#
+SPDX-FileCopyrightText: © 2020 Open Networking Foundation <support@opennetworking.org>
+SPDX-License-Identifier: Apache-2.0
+#}
+MAKE="echo; make -C src/ BUILD_KERNEL=$kernelver"
+CLEAN="make -C src/ clean"
+BUILT_MODULE_NAME=ice
+BUILT_MODULE_LOCATION=src/
+PACKAGE_NAME=ice
+PACKAGE_VERSION={{ dkms_ice_version }}
+DEST_MODULE_LOCATION=/updates
+AUTOINSTALL=yes
+REMAKE_INITRD=yes

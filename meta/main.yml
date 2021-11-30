@@ -1,0 +1,29 @@
+---
+# dkms meta/main.yml
+#
+# SPDX-FileCopyrightText: © 2021 Open Networking Foundation <support@opennetworking.org>
+# SPDX-License-Identifier: Apache-2.0
+
+galaxy_info:
+  author: Open Networking Foundation
+  description: Installs DKMS for dynamic recompilation of kernel modules
+  company: Open Networking Foundation
+
+  issue_tracker_url: https://jira.opennetworking.org/
+
+  license: Apache-2.0
+
+  min_ansible_version: 2.9.5
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - "18.04"
+    - name: Debian
+      versions:
+        - 11
+
+  galaxy_tags:
+    - dkms
+
+dependencies: []

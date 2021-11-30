@@ -1,0 +1,14 @@
+---
+# dkms defaults/main.yml
+#
+# SPDX-FileCopyrightText: © 2021 Open Networking Foundation <support@opennetworking.org>
+# SPDX-License-Identifier: Apache-2.0
+
+dkms_modules:
+  - ice
+
+# intel E810 network driver
+# https://www.intel.com/content/www/us/en/download/19630/intel-network-adapter-driver-for-e810-series-devices-under-linux.html
+dkms_ice_version: "1.6.7"
+dkms_ice_dl_url: "https://downloadmirror.intel.com/29746/ice-1.6.7.tar.gz"
+dkms_ice_checksum: "sha256:cf1124051e3d84dab2943a591735661b7323b72592779cd3e69854bd9ffaed33"

@@ -1,0 +1,38 @@
+---
+# dkms molecule/default/molecule.yml
+#
+# SPDX-FileCopyrightText: © 2021 Open Networking Foundation <support@opennetworking.org>
+# SPDX-License-Identifier: Apache-2.0
+
+dependency:
+  name: galaxy
+driver:
+  name: vagrant
+platforms:
+  - name: instance
+    box: generic/ubuntu1804
+    memory: 512
+    cpus: 1
+# driver:
+#   name: docker
+# platforms:
+#   - name: "ubuntu-18.04-priv"
+#     image: "quay.io/paulfantom/molecule-systemd:ubuntu-18.04"
+#     privileged: true
+#     volumes:
+#       - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+#   - name: "debian-11-priv"
+#     image: "onfinfra/molecule-systemd:debian-11"
+#     privileged: true
+#     volumes:
+#       - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+provisioner:
+  name: ansible
+# inventory:
+#   host_vars:
+#     ubuntu-18.04-priv:
+#       ansible_python_interpreter: /usr/bin/python3
+#     debian-11-priv:
+#       ansible_python_interpreter: /usr/bin/python3
+verifier:
+  name: ansible

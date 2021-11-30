@@ -1,0 +1,25 @@
+---
+# dkms tasks/main.yml
+#
+# SPDX-FileCopyrightText: © 2021 Open Networking Foundation <support@opennetworking.org>
+# SPDX-License-Identifier: Apache-2.0
+
+- name: include OS-specific vars
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: include OS-specific tasks
+  include_tasks: "{{ ansible_os_family }}.yml"
+
+- name: Create dist dir
+  file:
+    path: "{{ dkms_dist_dir }}"
+    state: directory
+    owner: "root"
+    group: "root"
+    mode: "0755"
+
+- name: Include DKMS modules
+  include_tasks: "{{ dkms_module }}.yml"
+  loop: "{{ dkms_modules | flatten(levels=1) }}"
+  loop_control:
+    loop_var: dkms_module

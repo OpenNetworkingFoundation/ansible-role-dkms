@@ -1,0 +1,16 @@
+{
+    "_template": "../cookiecutters/role",
+    "author": "Open Networking Foundation",
+    "company": "Open Networking Foundation",
+    "description": "Installs DKMS for dynamic recompilation of kernel modules",
+    "email": "support@opennetworking.org",
+    "issue_tracker_url": "https://jira.opennetworking.org/",
+    "license": "Apache-2.0",
+    "min_ansible_version": "2.9.5",
+    "molecule_privileged": "true",
+    "platform": "deleteme",
+    "platforms": {},
+    "role_defaults": {},
+    "role_name": "dkms",
+    "year": "2021"
+}
