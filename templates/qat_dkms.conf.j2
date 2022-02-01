@@ -1,0 +1,13 @@
+{#
+SPDX-FileCopyrightText: © 2020 Open Networking Foundation <support@opennetworking.org>
+SPDX-License-Identifier: Apache-2.0
+#}
+MAKE="echo; ./configure --enable-icp-sriov=host && make && make install"
+CLEAN="make clean && make distclean"
+BUILT_MODULE_NAME=qat_api
+BUILT_MODULE_LOCATION=build/
+PACKAGE_NAME=qat
+PACKAGE_VERSION={{ sriov_qat_version }}
+DEST_MODULE_LOCATION=/updates
+AUTOINSTALL=yes
+REMAKE_INITRD=yes

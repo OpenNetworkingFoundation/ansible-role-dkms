@@ -1,0 +1,121 @@
+---
+# qat tasks/qat.yml
+#
+# SPDX-FileCopyrightText: © 2022 Open Networking Foundation <support@opennetworking.org>
+# SPDX-Lqatnse-Identifier: Apache-2.0
+
+- name: Blacklist kernel QAT drivers
+  blockinfile:
+    create: true
+    dest: /etc/modprobe.d/blacklist-intel_qat.conf
+    mode: 0644
+    block: |
+      # Blacklist kernel QAT drivers
+      blacklist qat_c62x
+      blacklist qat_c62xvf
+      blacklist qat_c6xx
+      blacklist qat_c6xxvf
+      blacklist qat_c3xxx
+      blacklist qat_c3xxxvf
+      blacklist qat_d15xx
+      blacklist qat_d15xxvf
+      blacklist qat_c4xxx
+      blacklist qat_c4xxxvf
+      blacklist intel_qat
+    backup: true
+  notify: reboot qat
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Install QAT driver compile requirements
+  apt:
+    name:
+      - "libboost-all-dev"
+      - "pciutils-dev"
+      - "libssl-dev"
+      - "build-essential"
+      - "pkg-config"
+      - "yasm"
+    state: "present"
+    update_cache: true
+
+- name: Create root folder for QAT driver
+  file:
+    path: "{{ sriov_qat_driver_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Download QAT driver .tgz file
+  get_url:
+    url: "{{ sriov_qat_latest_url }}"
+    dest: "{{ sriov_qat_driver_dir }}/{{ sriov_qat_latest_name }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+    checksum: "{{ sriov_qat_checksum }}"
+
+- name: Create qat directory in /usr/src
+  file:
+    path: "/usr/src/qat-{{ sriov_qat_version }}"
+    state: directory
+    owner: "root"
+    group: "root"
+    mode: "0755"
+
+- name: Decompress qat archive
+  unarchive:
+    remote_src: true
+    src: "{{ sriov_qat_driver_dir }}/{{ sriov_qat_latest_name }}"
+    dest: "/usr/src/qat-{{ sriov_qat_version }}"
+    owner: "root"
+    group: "root"
+    extra_opts:
+      - "--strip-components=1" # remove initial directory name
+    creates: "/usr/src/qat-{{ sriov_qat_version }}/README"
+
+- name: Copy over qat dkms.conf
+  template:
+    src: "qat_dkms.conf.j2"
+    dest: "/usr/src/qat-{{ sriov_qat_version }}/dkms.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: add qat to DKMS
+  command:
+    cmd: "dkms add -m qat -v {{ sriov_qat_version }}"
+    chdir: "/usr/src/qat-{{ sriov_qat_version }}"
+    creates: "/var/lib/dkms/qat/{{ sriov_qat_version }}/source/README"
+
+- name: build qat using DKMS
+  command:
+    cmd: "dkms build -m qat -v {{ sriov_qat_version }}"
+    chdir: "/usr/src/qat-{{ sriov_qat_version }}"
+
+- name: install qat modules with DKMS
+  command:
+    cmd: "dkms install -m qat -v {{ sriov_qat_version }}"
+    chdir: "/usr/src/qat-{{ sriov_qat_version }}"
+
+- name: Create sriov_qat system servqat
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    owner: root
+    group: root
+  loop:
+    - {
+        src: "sriov_qat.sh.j2",
+        dest: "/usr/local/bin/sriov_qat.sh",
+        mode: "a+x",
+      }
+    - {
+        src: "sriov_qat.service.j2",
+        dest: "/etc/systemd/system/sriov_qat.service",
+        mode: 644,
+      }
+  notify: enable sriov_qat.service

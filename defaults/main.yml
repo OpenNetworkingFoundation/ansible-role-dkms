@@ -6,9 +6,17 @@
 
 dkms_modules:
   - ice
+  # - qat
 
 # intel E810 network driver
 # https://www.intel.com/content/www/us/en/download/19630/intel-network-adapter-driver-for-e810-series-devices-under-linux.html
 dkms_ice_version: "1.6.7"
 dkms_ice_dl_url: "https://downloadmirror.intel.com/29746/ice-1.6.7.tar.gz"
 dkms_ice_checksum: "sha256:cf1124051e3d84dab2943a591735661b7323b72592779cd3e69854bd9ffaed33"
+
+# Provide QAT driver parameters
+sriov_qat_version: "4.16.0"
+sriov_qat_driver_dir: "/opt/qat"
+sriov_qat_latest_name: "QAT.L.4.16.0-00017.tar.gz"
+sriov_qat_latest_url: "https://downloadmirror.intel.com/710050/QAT.L.4.16.0-00017.tar.gz"
+sriov_qat_checksum: "sha256:315f48057253798fae386e514ce834d6b5939eb842491fe27bfc019c42c430f4"
